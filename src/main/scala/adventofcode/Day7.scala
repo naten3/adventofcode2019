@@ -6,7 +6,7 @@ import scala.io.Source
 object Day7 {
   def main(args: Array[String]): Unit = {
     val numbers = Source.fromResource("day7.txt").getLines.toList(0).split(',').map(_.toInt)
-    // println(part1(numbers))
+    println(part1(numbers))
     println(part2(numbers))
   }
 
@@ -105,33 +105,37 @@ object Day7 {
 
   def part2(lines: Array[Int]): Int = {
     (5 to 9).permutations.map(seq => {
-      val amplifiers = Array(9,8,7,6,5).map(new Amplifier(lines.clone(), _)).toArray
+      val amplifiers = seq.map(new Amplifier(lines.clone(), _)).toArray
 
       var output: Option[Int] = Some(0)
       var previousOutput: Option[Int] = Some(0)
       var index = 0
+      var eOutput = 0
       while(output.isDefined) {
         val amplifier = amplifiers(index % amplifiers.length)
-        index += 1
         previousOutput = output
-        output = amplifier.acceptInput(previousOutput.get)
+        output = amplifier.acceptInput(previousOutput.get, index < amplifiers.length)
+        if (output.isDefined && index % amplifiers.size == amplifiers.size - 1) {
+          eOutput = output.get
+        }
+        index += 1
       }
 
-      previousOutput.get
+      eOutput
     }).max
   }
 
   class Amplifier(lines: Array[Int], phaseSetting: Int) {
     var position = 0
 
-    def acceptInput(input: Int): Option[Int] = {
-      val inputs = List(phaseSetting, input)
+    def acceptInput(input: Int, firstRun: Boolean): Option[Int] = {
+      val inputs = if (firstRun) List(phaseSetting, input) else List(input)
       processArray(inputs)
     }
 
     private def processArray(input: List[Int]): Option[Int] = {
       var output = 0
-      var mutableInputes = input;
+      var mutableInputs = input;
       while(true) {
         val currentCode = lines(position).toString;
         val leftPaddedCode: String = ((currentCode.length + 1 to 5).map(_ => '0').mkString + currentCode).reverse
@@ -164,8 +168,8 @@ object Day7 {
           val operationResult = operation(val1, val2)
           lines(lines(position + 3)) = operationResult
         } else if (opCode == 3) {
-          lines(lines(position + 1)) = mutableInputes.head
-          mutableInputes = mutableInputes.tail
+          lines(lines(position + 1)) = mutableInputs.head
+          mutableInputs = mutableInputs.tail
         } else if (opCode == 4) {
           val op = params(0)
           position += positionMove;
