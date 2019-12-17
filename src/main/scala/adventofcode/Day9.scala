@@ -7,6 +7,7 @@ object Day9 {
   def main(args: Array[String]): Unit = {
     val numbers = Source.fromResource("day9.txt").getLines.toList(0).split(',').map(_.toLong).concat((0 to 1000).map(_ => 0L))
     println(part1(numbers))
+    println(part2(numbers))
   }
 
   def part1(lines: Array[Long]): Long = {
@@ -17,12 +18,23 @@ object Day9 {
       output = amplifier.acceptInput(1L)
       if (output.isDefined) {
         lastOutput = output.get
-        println(lastOutput)
       }
     }
-    return lastOutput
+    lastOutput
   }
 
+  def part2(lines: Array[Long]): Long = {
+    val amplifier = new Amplifier(lines.clone())
+    var output: Option[Long] = Some(0L)
+    var lastOutput: Long = 0L
+    while(output.isDefined) {
+      output = amplifier.acceptInput(2L)
+      if (output.isDefined) {
+        lastOutput = output.get
+      }
+    }
+    lastOutput
+  }
 
   val paramCountsByOpCode = Map(
     1 -> 3,
@@ -52,7 +64,6 @@ object Day9 {
     }
 
     private def processArray(input: List[Long]): Option[Long] = {
-      var output = 0L
       var mutableInputs = input;
       while(true) {
         val currentCode = lines(position).toString;
@@ -86,11 +97,13 @@ object Day9 {
             throw new Exception("this shouldn't happen")
           }
 
-          val List(val1, val2, _) = params
+          val List(val1, val2, param3) = params
           val operationResult = operation(val1, val2)
-          lines(lines(position + 3).toInt) = operationResult
+          val writePosition = if (parameterModes(2) == 2) relativeBase + lines(position + 3).toInt else lines(position + 3).toInt
+          lines(writePosition) = operationResult
         } else if (opCode == 3) {
-          lines(lines(position + 1).toInt) = mutableInputs.head
+          val writePosition = if (parameterModes.head == 2) relativeBase + lines(position + 1).toInt else lines(position + 1).toInt
+          lines(writePosition) = mutableInputs.head
           mutableInputs = mutableInputs.tail
         } else if (opCode == 4) {
           val op = params(0)
@@ -104,9 +117,10 @@ object Day9 {
             hasJumped = true
           }
         } else if (opCode == 7 || opCode == 8) {
-          val List(param1, param2, _) = params
+          val List(param1, param2, param3) = params
           val checkFunction = if (opCode == 7) (a: Long, b: Long) => a < b else  (a: Long, b: Long) => a == b
-          lines(lines(position + 3).toInt) = if (checkFunction(param1, param2)) 1 else 0
+          val writePosition = if (parameterModes(2) == 2) relativeBase + lines(position + 3).toInt else lines(position + 3).toInt
+          lines(writePosition) = if (checkFunction(param1, param2)) 1 else 0
         } else if (opCode == 9) {
           relativeBase += params(0).toInt
         } else {
