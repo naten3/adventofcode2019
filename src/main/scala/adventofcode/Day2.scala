@@ -46,7 +46,7 @@ object Day2 {
         try {
           processArray(listCopy) == 19690720
         } catch {
-          case _ => false
+          case _: Throwable => false
         }
       }).get
     100 * noun + verb

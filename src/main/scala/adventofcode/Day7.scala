@@ -14,7 +14,6 @@ object Day7 {
     maxSequence(lines)
   }
 
-
   val paramCountsByOpCode = Map(
     1 -> 3,
     2 -> 3,
