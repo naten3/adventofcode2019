@@ -18,18 +18,12 @@ object Day10 {
     println(part1(asteroidCoordinates))
     println(part2(asteroidCoordinates))
   }
-
-  abstract class Vector();
-  case class DefinedSlope(slope: Float, up: Boolean) extends Vector
-  case class VerticalSlope(up: Boolean) extends Vector
-  case class HorizontalSlope(right: Boolean) extends Vector
-
   def part1(asteroidCoordinates: Array[Coordinate]): Int = {
     relativeAsteroids(asteroidCoordinates)._2.size
   }
 
-
   case class FoldResult(lists: Array[List[Coordinate]], position: Int, lastDestroyed: Coordinate)
+
   def part2(asteroidCoordinates: Array[Coordinate]): Int = {
     val (lazerCoord, asteroidMap) = relativeAsteroids(asteroidCoordinates)
     // all lines of angles in order in which lazer will hit them, asteroids in the same line are sorted by distance from the lazer
