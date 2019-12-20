@@ -28,8 +28,27 @@ object Day14 {
   }
 
   def part1(recipes: Array[Recipe]): Int = {
+    cheapestFuel(recipes)
+  }
+
+  case class SynthesisResult(cost: Int, leftovers: Map[String, Int])
+  def cheapestFuel(recipes: Array[Recipe]): Int = {
     val recipeMap = recipes.groupBy(_.result.symbol)
-    
+    def cheapestFuel(currentlyMaking: String, currentCost: Int, ): Int = {
+      val recipes = recipeMap(currentlyMaking)
+
+      val minOre = recipes.map(recipe => {
+        recipe.ingredients.map( ingredient => {
+          if (ingredient.symbol == "ORE") {
+            ingredient.amount
+          } else {
+
+          }
+        }).sum
+      }).min
+    }
+
+    cheapestFuel("FUEL", 0, Map())
   }
 }
 
